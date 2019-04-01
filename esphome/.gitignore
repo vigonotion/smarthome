@@ -1,0 +1,3 @@
+# ESPHome ignores
+/secrets.yaml
+/**/
