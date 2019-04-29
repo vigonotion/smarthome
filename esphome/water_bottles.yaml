@@ -1,0 +1,49 @@
+########################################################################
+#
+# This is the esphome config file for my water bottles scale.
+# It reports the remaining count of water bottles in the crate.
+#
+# Module in use: WeMos D1 mini
+#
+# @author Tom Schneider (https://vigonotion.com)
+#
+########################################################################
+
+esphome:
+  name: water_bottles
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+ota:
+logger:
+
+sensor:
+  - platform: hx711
+    name: "water_bottles_weight"
+    id: water_bottles_weight
+    dout_pin: D2
+    clk_pin: D1
+    gain: 128
+    update_interval: 60s
+    filters:
+      - lambda: |-
+          auto first_mass = 0.0; // first known mass was 0kg
+          auto first_value = 25136; // value for the first known mass was 
+          auto second_mass = 12840; // second mass was 
+          auto second_value = 24568; // second value was
+
+          auto r = map(x/1000, first_value, second_value, first_mass, second_mass);
+          if (r > 0) return r;
+          return 0;
+    unit_of_measurement: g
+
+  - platform: template
+    name: "water_bottles_count"
+    lambda: |-
+      return floor(id(water_bottles_weight).state / 1000);
+    update_interval: 60s
