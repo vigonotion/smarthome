@@ -1,0 +1,50 @@
+########################################################################
+#
+# This is the esphome config file for my front door camera.
+# It features a camera and a pir
+#
+# Module in use: TTGO T-Camera ESP32-WROVER-B OV2640 Camera Module
+#
+# @author Tom Schneider (https://vigonotion.com)
+#
+########################################################################
+
+esphome:
+  name: haustuer
+  platform: ESP32
+  board: ttgo-t-beam
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+ota:
+logger:
+
+binary_sensor:
+  # Motion
+  - platform: gpio
+    pin: GPIO33
+    name: front_door_motion
+    device_class: motion
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 20s
+
+esp32_camera:
+  name: front_door
+  external_clock:
+    pin: GPIO32
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO13
+    scl: GPIO12
+  data_pins: [GPIO5, GPIO14, GPIO4, GPIO15, GPIO18, GPIO23, GPIO36, GPIO39]
+  vsync_pin: GPIO27
+  href_pin: GPIO25
+  pixel_clock_pin: GPIO19
+  power_down_pin: 26
+  resolution: 640x480
+  jpeg_quality: 10
+  max_framerate: 25 fps

@@ -1,8 +1,7 @@
 ########################################################################
 #
 # This is the esphome config file for my front door camera.
-# It features a camera, a pir, a connection to the bell and
-# two reed switches to detect new mail and emptying the mail.
+# It features a camera and a pir
 #
 # Module in use: TTGO T-Camera ESP32-WROVER-B OV2640 Camera Module
 #
@@ -11,7 +10,7 @@
 ########################################################################
 
 esphome:
-  name: front_door
+  name: schuppen
   platform: ESP32
   board: ttgo-t-beam
 
@@ -27,44 +26,14 @@ binary_sensor:
   # Motion
   - platform: gpio
     pin: GPIO33
-    name: front_door_motion
+    name: motion
     device_class: motion
     filters:
       - delayed_on: 10ms
       - delayed_off: 20s
 
-  # Bell
-  - platform: gpio
-    pin:
-      number: GPIO34
-      inverted: True
-    name: front_door_bell
-    filters:
-      - delayed_on: 10ms
-      - delayed_off: 5s
-
-  # Mailbox (new) 
-  - platform: gpio
-    pin:
-      number: GPIO21
-      inverted: True
-    name: mailbox_new
-    filters:
-      - delayed_on: 10ms
-      - delayed_off: 2s
-
-  # Mailbox (emptied) 
-  - platform: gpio
-    pin:
-      number: GPIO22
-      inverted: True
-    name: mailbox_emptied
-    filters:
-      - delayed_on: 10ms
-      - delayed_off: 2s
-
 esp32_camera:
-  name: front_door
+  name: camera
   external_clock:
     pin: GPIO32
     frequency: 20MHz
@@ -78,3 +47,4 @@ esp32_camera:
   power_down_pin: 26
   resolution: 640x480
   jpeg_quality: 10
+  max_framerate: 25 fps

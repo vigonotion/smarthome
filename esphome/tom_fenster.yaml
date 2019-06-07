@@ -1,0 +1,55 @@
+########################################################################
+#
+# This is the esphome config file for my windows.
+# On four GPIO pins there are cheap reed switches that stick at my windows.
+#
+# Module in use: NodeMCU Lua v2
+#
+# @author Tom Schneider (https://vigonotion.com)
+#
+########################################################################
+
+esphome:
+  name: tom_fenster
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+# Enable logging
+logger:
+
+ota:
+api:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D1
+      mode: INPUT_PULLUP
+    device_class: window
+    name: tom_kleines_fenster
+
+  - platform: gpio
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+    device_class: window
+    name: tom_balkontuer
+
+  - platform: gpio
+    pin:
+      number: D6
+      mode: INPUT_PULLUP
+    device_class: window
+    name: tom_breites_fenster
+    
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+    device_class: window
+    name: tom_seitenfenster
+
