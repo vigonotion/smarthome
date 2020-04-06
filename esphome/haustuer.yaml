@@ -1,14 +1,3 @@
-########################################################################
-#
-# This is the esphome config file for my front door camera.
-# It features a camera and a pir
-#
-# Module in use: TTGO T-Camera ESP32-WROVER-B OV2640 Camera Module
-#
-# @author Tom Schneider (https://vigonotion.com)
-#
-########################################################################
-
 esphome:
   name: haustuer
   platform: ESP32
@@ -32,6 +21,21 @@ binary_sensor:
       - delayed_on: 10ms
       - delayed_off: 20s
 
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: Doorbell Uptime
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: Doorbell WiFi Signal
+    update_interval: 60s
+    
+switch:
+  # Switch to restart the haustuer.
+  - platform: restart
+    name: Haustuer Restart
+    
 esp32_camera:
   name: front_door
   external_clock:
@@ -47,4 +51,4 @@ esp32_camera:
   power_down_pin: 26
   resolution: 640x480
   jpeg_quality: 10
-  max_framerate: 25 fps
+  idle_framerate: 0.01 fps

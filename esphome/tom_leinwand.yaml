@@ -1,15 +1,3 @@
-########################################################################
-#
-# This is the esphome config file for my screen.
-# It can open/close a IvoLum screen. See my blog entry here:
-# https://vigonotion.com/blog/building-a-smart-home-theater-with-home-assistant/
-#
-# Module in use: Sonoff Dual R2
-#
-# @author Tom Schneider (https://vigonotion.com)
-#
-########################################################################
-
 esphome:
   name: tom_leinwand
   platform: ESP8266

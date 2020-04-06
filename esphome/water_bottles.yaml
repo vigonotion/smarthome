@@ -1,22 +1,20 @@
-########################################################################
-#
-# This is the esphome config file for my water bottles scale.
-# It reports the remaining count of water bottles in the crate.
-#
-# Module in use: WeMos D1 mini
-#
-# @author Tom Schneider (https://vigonotion.com)
-#
-########################################################################
-
 esphome:
   name: water_bottles
   platform: ESP8266
   board: d1_mini
 
+
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  power_save_mode: none
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Water Bottles"
+    password: !secret ap_fallback_password
+
+captive_portal:
 
 api:
 ota:
@@ -31,19 +29,29 @@ sensor:
     gain: 128
     update_interval: 60s
     filters:
-      - lambda: |-
-          auto first_mass = 0.0; // first known mass was 0kg
-          auto first_value = 25136; // value for the first known mass was 
-          auto second_mass = 12840; // second mass was 
-          auto second_value = 24568; // second value was
-
-          auto r = map(x/1000, first_value, second_value, first_mass, second_mass);
-          if (r > 0) return r;
-          return 0;
+      - calibrate_linear:
+          - 18595 -> 0
+          - -296403 -> 12840
     unit_of_measurement: g
 
   - platform: template
     name: "water_bottles_count"
     lambda: |-
-      return floor(id(water_bottles_weight).state / 1000);
+      auto n = floor(id(water_bottles_weight).state / 1000);
+      if (n > 0) return n;
+      return 0;
     update_interval: 60s
+    accuracy_decimals: 0
+    
+  - platform: uptime
+    name: Water Bottles Uptime
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: Water Bottles WiFi Signal
+    update_interval: 60s
+    
+switch:
+  # Switch to restart the doorbell.
+  - platform: restart
+    name: Water Bottles Restart

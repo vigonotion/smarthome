@@ -1,0 +1,46 @@
+esphome:
+  name: schreibtisch_hinterleuchtung
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: none
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Schreibtisch Hinterleuchtung"
+    password: !secret ap_fallback_password
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+#RGBWarm
+output:
+  - platform: esp8266_pwm
+    pin: 12
+    frequency: 1000 Hz
+    id: pwm_b
+  - platform: esp8266_pwm
+    pin: 13
+    frequency: 1000 Hz
+    id: pwm_g
+  - platform: esp8266_pwm
+    pin: 15
+    frequency: 1000 Hz
+    id: pwm_r
+
+light:
+  - platform: rgb
+    name: "Tom Schreibtisch Hinterleuchtung"
+    red: pwm_r
+    green: pwm_g
+    blue: pwm_b

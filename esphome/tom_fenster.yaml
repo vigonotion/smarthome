@@ -1,14 +1,3 @@
-########################################################################
-#
-# This is the esphome config file for my windows.
-# On four GPIO pins there are cheap reed switches that stick at my windows.
-#
-# Module in use: NodeMCU Lua v2
-#
-# @author Tom Schneider (https://vigonotion.com)
-#
-########################################################################
-
 esphome:
   name: tom_fenster
   platform: ESP8266
@@ -52,4 +41,3 @@ binary_sensor:
       mode: INPUT_PULLUP
     device_class: window
     name: tom_seitenfenster
-
