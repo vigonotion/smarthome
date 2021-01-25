@@ -1,0 +1,16 @@
+# Exlude everything for safety reasons
+*
+
+# Include relevant parts
+!.gitignore
+
+!intents/
+!intents/**
+
+!slot_programs/
+!slot_programs/**
+
+!slots/
+!slots/**
+
+!sentences.ini
