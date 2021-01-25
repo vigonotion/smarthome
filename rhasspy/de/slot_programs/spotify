@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# Requires: curl, jq, bash to be installed
+# 
+# Receives playlists, albums, artists and tracks from Spotify.
+#
+# It receives the top 100 for
+#   a) the user
+#   b) the current country (profile)
+#   c) worldwide
+#
+# to generate the slot list.
+#
+
+echo "Running Spotify slot program..." >&2
+
+# Read Rhasspy profile JSON
+profile="${RHASSPY_PROFILE_DIR}/profile.json"
+
+client_id="$(jq --raw-output .spotify.client_id < "${profile}")"
+client_secret="$(jq --raw-output .spotify.client_secret < "${profile}")"
+
+auth=$(echo "${client_id}:${client_secret}" | base64 -w 0)
+
+refresh_token="$(jq --raw-output .spotify.refresh_token < "${profile}")"
+
+access_token=$(curl -s -d grant_type=refresh_token -d refresh_token=${refresh_token} -d client_id=${client_id} -d client_secret=${client_secret} https://accounts.spotify.com/api/token | jq -r ".access_token")
+
+country="DE"
+
+headers=(-H "Accept application/json" -H "Authorization: Bearer ${access_token}" )
+user_id=$(curl -s -X GET "https://api.spotify.com/v1/me" "${headers[@]}" | jq -r ".id")
+
+#curl -s -X GET "https://api.spotify.com/v1/artists/6qqNVTkY8uBg9cP3Jd7DAH/top-tracks?country=$country" -H "Accept: application/json" "${headers[@]}" #| jq -r ".tracks[:10][].id"
+
+# functions
+clean() {
+    sed "s/[^[:alnum:] ]//g"
+}
+
+get_user_top_artists() {
+    curl -s -X GET "https://api.spotify.com/v1/me/top/artists?limit=$1" -H "Accept: application/json" "${headers[@]}"
+}
+
+get_user_top_tracks() {
+    curl -s -X GET "https://api.spotify.com/v1/me/top/tracks?limit=$1" -H "Accept: application/json" "${headers[@]}"
+}
+
+get_artist_top_tracks() {
+    curl -s -X GET "https://api.spotify.com/v1/artists/$1/top-tracks?country=$country" -H "Accept: application/json" "${headers[@]}"
+}
+
+
+if [[ ! -z "$1" ]]; then
+    # Filter based on type
+    for type in "$@";
+    do
+
+        echo "Fetching ${type} from spotify..." >&2
+
+        if [[ "artists" =~ $type ]]; then
+            get_user_top_artists 50 | jq -r '.items[] as $e | "\($e.id) \($e.uri) \($e.name)"' | \
+            while read -r id uri name;
+            do
+                artist=$(echo ${name} | clean)
+                echo "(${artist}){artist:${uri}}"
+            done
+        elif [[ "tracks" =~ $type ]]; then
+            get_user_top_tracks 50 | jq -r '.items[] as $e | "\($e.id) \($e.uri) \($e.name)"' | \
+            while read -r id uri name;
+            do
+                track=$(echo ${name} | clean)
+                echo "(${track}){track:${uri}}"
+            done
+
+            echo ""
+            echo ""
+
+            get_user_top_artists 10 | jq -r '.items[] as $e | "\($e.id)"' | \
+            while read -r aid;
+            do
+                get_artist_top_tracks $aid | jq -r '.tracks[] as $e | "\($e.id) \($e.uri) \($e.name)"' | \
+                while read -r id uri name;
+                do
+                    track=$(echo ${name} | clean)
+                    echo "(${track}){track:${uri}}"
+                done
+            done
+        else
+            echo ":"
+        fi
+    done
+fi
