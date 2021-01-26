@@ -1,0 +1,6 @@
+schlafzimmer {site:sat02}
+flur {site:sat06}
+esszimmer {site:sat03}
+küche {site:sat04}
+wohnzimmer {site:sat01}
+(badezimmer|bad|toilette|klo) {site:sat05}
