@@ -17,6 +17,8 @@
         enabled: false
         state: stopped
     - name: Copy config file
+      tags:
+        - config
       copy:
         src: ../res/snapserver.conf
         dest: /etc/snapserver.conf
@@ -31,6 +33,35 @@
         name: raspotify
         enabled: false
         state: stopped
+
+    # mpd
+    - name: "Install mpd"
+      apt:
+        name: mpd
+        state: latest
+    - name: Copy mpd config file
+      tags:
+        - config
+      copy:
+        src: ../res/mpd.conf
+        dest: /etc/mpd.conf
+    - name: Copy mpd config file
+      tags:
+        - config
+      copy:
+        src: ../res/mpd2.conf
+        dest: /etc/mpd2.conf
+    - name: Copy mpd@ service file
+      copy:
+        src: ../res/mpd@.service
+        dest: /etc/systemd/system/mpd@.service
+    - name: "Restart mpd"
+      tags:
+        - config
+      systemd:
+        name: mpd
+        enabled: true
+        state: restarted
 # - name: "Snapcast Clients" 
 #   hosts: audio
 #   become: true
