@@ -1,0 +1,41 @@
+---
+- name: "Snapcast Server" 
+  hosts: audioserver
+  become: true
+  tasks:
+    - name: "Install snapserver"
+      apt:
+        deb: https://github.com/badaix/snapcast/releases/download/v0.26.0/snapserver_0.26.0-1_amd64.deb
+        state: present
+    - name: "Install shairport sync"
+      apt:
+        name: shairport-sync
+        state: latest
+    - name: "Disable shairport autostart"
+      systemd:
+        name: shairport-sync
+        enabled: false
+        state: stopped
+    - name: Copy config file
+      copy:
+        src: ../res/snapserver.conf
+        dest: /etc/snapserver.conf
+
+    # Librespot
+    - name: "Install raspotify"
+      apt:
+        deb: https://dtcooper.github.io/raspotify/raspotify-latest_amd64.deb
+        state: present
+    - name: "Disable raspotify autostart"
+      systemd:
+        name: raspotify
+        enabled: false
+        state: stopped
+# - name: "Snapcast Clients" 
+#   hosts: audio
+#   become: true
+#   tasks:
+#     - name: "Install snapclient"
+#       apt:
+#         name: snapclient
+#         state: latest
